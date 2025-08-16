@@ -91,14 +91,14 @@ function App() {
                           to="/event1" 
                           className="block w-full py-4 px-6 rounded-xl font-semibold text-white bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
                         >
-                          🎯 Start Round
+                         Start Round
                         </Link>
 
                         <Link
                           to="/leaderboard"
                           className="block w-full py-4 px-6 rounded-xl font-semibold text-white bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
                         >
-                          🏆 Leaderboard
+                          Leaderboard
                         </Link>
                       </div>
                     </div>

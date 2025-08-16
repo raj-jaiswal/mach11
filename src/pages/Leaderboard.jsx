@@ -58,7 +58,7 @@ export default function Leaderboard() {
               className="w-20 h-20 object-contain"
             />
           </div>
-          <h1 className="text-4xl font-bold gradient-text mb-2">🏆 Leaderboard</h1>
+          <h1 className="text-4xl font-bold gradient-text mb-2">Leaderboard</h1>
           <p className="text-gray-400">ROCKET BOYS - Aviation Trading Championship</p>
         </div>
 
@@ -90,7 +90,7 @@ export default function Leaderboard() {
                       <tr key={team.id} className="hover:bg-blue-500/10 transition-colors duration-200">
                         <td className="py-4 px-6">
                           <div className="flex items-center gap-3">
-                            <div className={`w-12 h-12 bg-gradient-to-br ${getRankColor(idx)} rounded-full flex items-center justify-center text-white font-bold`}>
+                            <div className={`w-12 h-12 ${getRankColor(idx)} rounded-full flex items-center justify-center text-white font-bold`}>
                               #{rank}
                             </div>
                             <span className="text-2xl">{getRankIcon(rank)}</span>
@@ -101,11 +101,6 @@ export default function Leaderboard() {
                             <span className="font-semibold text-white text-lg">
                               {team.teamName || team.id}
                             </span>
-                            {team.rolls && (
-                              <p className="text-gray-400 text-sm">
-                                Rolls: {team.rolls}
-                              </p>
-                            )}
                           </div>
                         </td>
                         <td className="py-4 px-6 text-right">
@@ -118,7 +113,7 @@ export default function Leaderboard() {
                             {change >= 0 ? '+' : ''}₹{Math.round(change).toLocaleString()}
                           </span>
                           <div className="text-xs text-gray-400">
-                            {change >= 0 ? '📈 Profit' : '📉 Loss'}
+                            {change >= 0 ? 'Profit' : 'Loss'}
                           </div>
                         </td>
                       </tr>
