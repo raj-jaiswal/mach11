@@ -21,7 +21,6 @@ export default function Login({ onLogin }) {
       const snap = await getDoc(teamRef);
 
       if (!snap.exists()) {
-        // New team: initialize with 10000 cash
         await setDoc(teamRef, {
           teamName: teamName.trim(),
           rolls: rolls.trim(),
@@ -30,7 +29,6 @@ export default function Login({ onLogin }) {
           createdAt: Date.now()
         });
       } else {
-        // Existing team: ensure base fields exist, do NOT overwrite cash
         const data = snap.data() || {};
         await setDoc(
           teamRef,
@@ -54,48 +52,83 @@ export default function Login({ onLogin }) {
   };
 
   return (
-    <div className="min-h-screen grid place-items-center bg-gray-100 p-4">
-      <form onSubmit={submit} className="bg-white text-black w-full max-w-md rounded-2xl shadow p-6 space-y-4">
-        <h1 className="text-2xl font-bold text-center">Login</h1>
+    <div className="min-h-screen flex items-center justify-center p-4">
+      <div className="w-full max-w-md fade-in">
+        <form onSubmit={submit} className="card">
+          <div className="text-center mb-8">
+            <div className="flex justify-center mb-4">
+              <img 
+                src="/logo.svg" 
+                alt="Rocket Boys Logo" 
+                className="w-24 h-24 object-contain"
+              />
+            </div>
+            <h1 className="text-3xl font-bold gradient-text mb-2">
+              ROCKET BOYS
+            </h1>
+            <p className="text-gray-400">
+              Aviation Trading Championship
+            </p>
+          </div>
 
-        <label className="block">
-          <span className="text-sm font-medium">Team Name</span>
-          <input
-            className="mt-1 w-full border rounded-lg p-2"
-            value={teamName}
-            onChange={(e) => setTeamName(e.target.value)}
-            placeholder="e.g., Falcons"
-          />
-        </label>
+          <div className="space-y-6">
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">
+                Team Name
+              </label>
+              <input
+                className="w-full"
+                value={teamName}
+                onChange={(e) => setTeamName(e.target.value)}
+                placeholder="e.g., Falcons"
+                required
+              />
+            </div>
 
-        <label className="block">
-          <span className="text-sm font-medium">Rolls (comma-separated)</span>
-          <input
-            className="mt-1 w-full border rounded-lg p-2"
-            value={rolls}
-            onChange={(e) => setRolls(e.target.value)}
-            placeholder="e.g., 23XX01, 23XX02"
-          />
-        </label>
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">
+                Roll Numbers
+              </label>
+              <input
+                className="w-full"
+                value={rolls}
+                onChange={(e) => setRolls(e.target.value)}
+                placeholder="e.g., 23XX01, 23XX02"
+                required
+              />
+            </div>
 
-        <label className="block">
-          <span className="text-sm font-medium">Institute Email</span>
-          <input
-            type="email"
-            className="mt-1 w-full border rounded-lg p-2"
-            value={instituteEmail}
-            onChange={(e) => setInstituteEmail(e.target.value)}
-            placeholder="name_roll@iitp.ac.in"
-          />
-        </label>
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">
+                Institute Email
+              </label>
+              <input
+                type="email"
+                className="w-full"
+                value={instituteEmail}
+                onChange={(e) => setInstituteEmail(e.target.value)}
+                placeholder="name_roll@iitp.ac.in"
+                required
+              />
+            </div>
 
-        <button
-          disabled={busy}
-          className="w-full bg-blue-600 text-white rounded-lg p-3 hover:bg-blue-700 disabled:opacity-50"
-        >
-          {busy ? "Signing in…" : "Enter"}
-        </button>
-      </form>
+            <button
+              type="submit"
+              disabled={busy}
+              className="w-full py-4 px-6 text-lg font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {busy ? (
+                <div className="flex items-center justify-center gap-3">
+                  <div className="loading"></div>
+                  Signing in...
+                </div>
+              ) : (
+                "Enter Dashboard"
+              )}
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 }

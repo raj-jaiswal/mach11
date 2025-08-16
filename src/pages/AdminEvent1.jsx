@@ -16,10 +16,9 @@ import {
 export default function AdminEvent1() {
   const [active, setActive] = useState(false);
   const [round, setRound] = useState(0);
-  const [bets, setBets] = useState([]); // [{teamName, plane, amount}]
+  const [bets, setBets] = useState([]);
   const [loadingBets, setLoadingBets] = useState(true);
 
-  // watch event state
   useEffect(() => {
     const unsub = onSnapshot(doc(db, "events", "event1"), (snap) => {
       const data = snap.data() || {};
@@ -29,7 +28,6 @@ export default function AdminEvent1() {
     return () => unsub();
   }, []);
 
-  // load bets for current round
   useEffect(() => {
     if (!round) {
       setBets([]);
@@ -46,7 +44,6 @@ export default function AdminEvent1() {
   }, [round, active]);
 
   const startRound = async () => {
-    // increment round and activate
     const ref = doc(db, "events", "event1");
     const snap = await getDoc(ref);
     const current = snap.exists() ? (snap.data().round || 0) : 0;
@@ -63,7 +60,7 @@ export default function AdminEvent1() {
 
   const checkout = async () => {
     if (!round) return alert("No active round to checkout.");
-    // fetch bets again to be safe
+    
     const q = query(collection(db, "event1_bets"), where("round", "==", round));
     const snapshot = await getDocs(q);
     const list = snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
@@ -84,7 +81,6 @@ export default function AdminEvent1() {
     const totalWinners = winners.reduce((s, b) => s + Number(b.amount || 0), 0);
     const totalLosers = losers.reduce((s, b) => s + Number(b.amount || 0), 0);
 
-    // apply balances
     for (const bet of losers) {
       const teamRef = doc(db, "teams", bet.teamName);
       const teamSnap = await getDoc(teamRef);
@@ -104,12 +100,10 @@ export default function AdminEvent1() {
       }
     }
 
-    // clear bets for this round
     for (const d of snapshot.docs) {
       await deleteDoc(doc(db, "event1_bets", d.id));
     }
 
-    // stop event
     await setDoc(doc(db, "events", "event1"), { active: false }, { merge: true });
     setActive(false);
     setBets([]);
@@ -127,62 +121,136 @@ export default function AdminEvent1() {
   }, [bets]);
 
   return (
-    <div className="max-w-3xl mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">Admin: Event 1</h1>
-
-      <div className="flex gap-3 mb-4">
-        {!active ? (
-          <button onClick={startRound} className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
-            Start New Round
-          </button>
-        ) : (
-          <button onClick={stopRound} className="bg-yellow-600 text-white px-4 py-2 rounded-lg hover:bg-yellow-700">
-            Stop (no checkout)
-          </button>
-        )}
-        <button onClick={checkout} className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700">
-          Checkout & Reset Bets
-        </button>
-      </div>
-
-      <div className="mb-2">Status: <b>{active ? "Active" : "Inactive"}</b> | Round: <b>{round}</b></div>
-
-      <div className="mt-4 bg-white rounded-xl shadow text-black">
-        <div className="p-4 border-b font-semibold">Bets (Round {round})</div>
-        <div className="p-4">
-          {loadingBets ? (
-            <div>Loading bets…</div>
-          ) : bets.length === 0 ? (
-            <div>No bets yet.</div>
-          ) : (
-            <ul className="divide-y">
-              {bets.map((b) => (
-                <li key={b.id} className="py-2 flex items-center justify-between">
-                  <span className="font-medium">{b.teamName}</span>
-                  <span>Plane: <b>{b.plane}</b></span>
-                  <span>Amt: <b>₹{b.amount}</b></span>
-                </li>
-              ))}
-            </ul>
-          )}
+    <div className="min-h-screen p-4">
+      <div className="max-w-6xl mx-auto fade-in">
+        <div className="text-center mb-8">
+          <div className="flex justify-center mb-4">
+            <img 
+              src="/logo.svg" 
+              alt="Rocket Boys Logo" 
+              className="w-20 h-20 object-contain"
+            />
+          </div>
+          <h1 className="text-4xl font-bold gradient-text mb-2">⚙️ Admin Panel</h1>
+          <p className="text-gray-400">ROCKET BOYS - Event Management</p>
         </div>
-      </div>
 
-      <div className="mt-6 bg-white rounded-xl shadow text-black">
-        <div className="p-4 border-b font-semibold">Totals by Plane</div>
-        <div className="p-4">
-          {totals.length === 0 ? (
-            <div>No totals yet.</div>
-          ) : (
-            <ul className="space-y-1">
-              {totals.map(([plane, amt]) => (
-                <li key={plane} className="flex justify-between">
-                  <span>Plane {plane}</span>
-                  <span>₹{amt}</span>
-                </li>
-              ))}
-            </ul>
-          )}
+        {/* Status Card */}
+        <div className="card mb-6">
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h2 className="text-2xl font-bold text-white mb-2">Event Status</h2>
+              <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2">
+                  <span className="text-gray-400">Status:</span>
+                  <span className={active ? "status-active" : "status-inactive"}>
+                    {active ? "🟢 Active" : "🔴 Inactive"}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-gray-400">Round:</span>
+                  <span className="text-white font-bold text-lg">#{round}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex flex-wrap gap-3">
+            {!active ? (
+              <button onClick={startRound} className="btn-success">
+                ▶️ Start New Round
+              </button>
+            ) : (
+              <button onClick={stopRound} className="btn-warning">
+                ⏸️ Stop Round
+              </button>
+            )}
+            <button onClick={checkout} className="btn-danger">
+              💰 Checkout & Reset
+            </button>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Bets Table */}
+          <div className="card">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-xl font-bold text-white">Current Bets</h3>
+              <span className="text-sm text-gray-400">Round {round}</span>
+            </div>
+            
+            {loadingBets ? (
+              <div className="text-center py-8">
+                <div className="loading mb-4"></div>
+                <p className="text-gray-400">Loading bets...</p>
+              </div>
+            ) : bets.length === 0 ? (
+              <div className="text-center py-8">
+                <div className="text-4xl mb-4">📝</div>
+                <p className="text-gray-400">No bets placed yet</p>
+              </div>
+            ) : (
+              <div className="overflow-hidden rounded-xl border border-gray-600">
+                <table className="w-full">
+                  <thead>
+                    <tr className="bg-gray-800">
+                      <th className="text-left py-3 px-4 text-sm">Team</th>
+                      <th className="text-center py-3 px-4 text-sm">Plane</th>
+                      <th className="text-right py-3 px-4 text-sm">Amount</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {bets.map((bet) => (
+                      <tr key={bet.id} className="border-t border-gray-700 hover:bg-blue-500/10">
+                        <td className="py-3 px-4 font-medium text-white">{bet.teamName}</td>
+                        <td className="py-3 px-4 text-center">
+                          <span className="bg-blue-600 text-white px-2 py-1 rounded-full text-sm font-bold">
+                            {bet.plane}
+                          </span>
+                        </td>
+                        <td className="py-3 px-4 text-right font-bold text-green-400">
+                          ₹{bet.amount}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+
+          {/* Totals by Plane */}
+          <div className="card">
+            <h3 className="text-xl font-bold text-white mb-4">Plane Totals</h3>
+            
+            {totals.length === 0 ? (
+              <div className="text-center py-8">
+                <div className="text-4xl mb-4">📊</div>
+                <p className="text-gray-400">No totals to display</p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {totals.map(([plane, amount], idx) => (
+                  <div 
+                    key={plane} 
+                    className="flex items-center justify-between p-4 bg-gray-800 rounded-xl hover:bg-gray-700 transition-colors duration-200"
+                  >
+                    <div className="flex items-center gap-3">
+                      <span className="text-2xl">
+                        {idx === 0 ? "🏆" : idx === 1 ? "🥈" : idx === 2 ? "🥉" : "✈️"}
+                      </span>
+                      <span className="font-semibold text-white text-lg">
+                        Plane {plane}
+                      </span>
+                    </div>
+                    <span className="text-xl font-bold text-green-400">
+                      ₹{amount}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>
