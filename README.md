@@ -125,7 +125,5 @@ PRs and Issues are welcome. Suggested workflow:
 3. Commit changes with clear messages.
 4. Open a Pull Request describing the change and rationale.
 
-Add issue templates and a contributing guide if you plan to accept external contributions.
 ---
-*This README was generated and formatted for you by ChatGPT.*
 
